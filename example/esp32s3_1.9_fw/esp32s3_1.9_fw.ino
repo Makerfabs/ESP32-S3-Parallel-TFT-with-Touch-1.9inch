@@ -114,7 +114,11 @@ void setup()
         delay(1000);
     }
 
-    draw_button(button_status);
+    gfx->fillScreen(WHITE);
+    gfx->setTextColor(BLACK);
+    gfx->println(" Start Draw");
+
+    // draw_button(button_status);
 }
 
 void loop(void)
@@ -124,14 +128,15 @@ void loop(void)
     int y = -1;
     if (get_touch(&x, &y) == 1)
     {
-        if (x < 160)
-            button_status = 1;
-        else
-            button_status = 0;
+        // if (x < 160)
+        //     button_status = 1;
+        // else
+        //     button_status = 0;
 
-        draw_button(button_status);
+        // draw_button(button_status);
+        gfx->fillCircle(x, y, 5, RED);
     }
-    delay(100);
+    delay(10);
     // USBSerial.println("loop");
 }
 
