@@ -14,6 +14,7 @@
 ## Intruduce
 
 Product Link:[ESP32-S3 Parallel TFT with Touch 1.9"](https://www.makerfabs.com/matouch-esp32-s3-parallel-tft-with-touch-1-9-inch.html?search=Esp32%20s3%201.9)
+
 Wiki Link : [ESP32-S3 Parallel 1.9 TFT with Touch](https://wiki.makerfabs.com/ESP32_S3_Parallel_1.9_TFT_with_Touch.html)
 
 IoT applications have a certain demand for the 1.9" screen. The small screen brings higher cost performance and utilization rate. Its main control chip adopts ESP32-S3R8 Dual-core LX7 microcontroller, it features Wifi/ WiFi& Bluetooth 5.0 + BT mesh.
