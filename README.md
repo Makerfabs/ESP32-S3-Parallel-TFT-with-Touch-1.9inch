@@ -1,6 +1,7 @@
 # ESP32-S3-Parallel-TFT-with-Touch-1.9inch
 ```
-/*  Version:      V1.1
+/* 
+    Version:      V1.1
     Author:       Ricardo
     Create Date:  2023/4/27
 */
