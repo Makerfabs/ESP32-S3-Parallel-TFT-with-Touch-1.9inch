@@ -1,0 +1,102 @@
+#include "lv_demo_benchmark.h"
+#include "pin_config.h"
+
+#include <Arduino_GFX_Library.h>
+
+Arduino_DataBus *bus = new Arduino_ESP32LCD8(47 /* DC */, 46 /* CS */, 38 /* WR */, 39 /* RD */, 9 /* D0 */, 10 /* D1 */, 11 /* D2 */, 12 /* D3 */,
+                                             13 /* D4 */, 14 /* D5 */, 15 /* D6 */, 16 /* D7 */);
+
+Arduino_GFX *gfx = new Arduino_ST7789(bus, 48 /* RST */, 0 /* rotation */, true /* IPS */, 170 /* width */, 320 /* height */, 35 /* col offset 1 */,
+                                      0 /* row offset 1 */, 35 /* col offset 2 */, 0 /* row offset 2 */);
+
+/*******************************************************************************
+ * End of Arduino_GFX setting
+ ******************************************************************************/
+
+/* Change to your screen resolution */
+static uint32_t screenWidth;
+static uint32_t screenHeight;
+static lv_disp_draw_buf_t draw_buf;
+static lv_color_t *disp_draw_buf;
+static lv_disp_drv_t disp_drv;
+static unsigned long last_ms;
+
+/* Display flushing */
+void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p)
+{
+   uint32_t w = (area->x2 - area->x1 + 1);
+   uint32_t h = (area->y2 - area->y1 + 1);
+
+#if (LV_COLOR_16_SWAP != 0)
+   gfx->draw16bitBeRGBBitmap(area->x1, area->y1, (uint16_t *)&color_p->full, w, h);
+#else
+   gfx->draw16bitRGBBitmap(area->x1, area->y1, (uint16_t *)&color_p->full, w, h);
+#endif
+
+   lv_disp_flush_ready(disp);
+}
+
+void setup()
+{
+   Serial.begin(115200);
+   Serial.println("LVGL Benchmark Demo");
+
+   pinMode(PIN_LCD_BL, OUTPUT);
+   digitalWrite(PIN_LCD_BL, HIGH);
+
+   pinMode(PIN_LCD_RST, OUTPUT);
+   digitalWrite(PIN_LCD_RST, HIGH);
+
+   ledcSetup(0, 2000, 8);
+   ledcAttachPin(PIN_LCD_BL, 0);
+   ledcWrite(0, 255);
+
+   // Init Display
+   gfx->begin();
+   gfx->setRotation(1);
+   gfx->fillScreen(BLACK);
+
+   lv_init();
+
+   screenWidth = gfx->width();
+   screenHeight = gfx->height();
+#ifdef ESP32
+   disp_draw_buf = (lv_color_t *)heap_caps_malloc(sizeof(lv_color_t) * screenWidth * 10, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+#else
+   disp_draw_buf = (lv_color_t *)malloc(sizeof(lv_color_t) * screenWidth * 10);
+#endif
+   if (!disp_draw_buf)
+   {
+      Serial.println("LVGL disp_draw_buf allocate failed!");
+   }
+   else
+   {
+      lv_disp_draw_buf_init(&draw_buf, disp_draw_buf, NULL, screenWidth * 10);
+
+      /* Initialize the display */
+      lv_disp_drv_init(&disp_drv);
+      /* Change the following line to your display resolution */
+      disp_drv.hor_res = screenWidth;
+      disp_drv.ver_res = screenHeight;
+      disp_drv.flush_cb = my_disp_flush;
+      disp_drv.draw_buf = &draw_buf;
+      lv_disp_drv_register(&disp_drv);
+
+      /* Initialize the (dummy) input device driver */
+      static lv_indev_drv_t indev_drv;
+      lv_indev_drv_init(&indev_drv);
+      indev_drv.type = LV_INDEV_TYPE_POINTER;
+      lv_indev_drv_register(&indev_drv);
+
+      lv_demo_benchmark();
+
+      Serial.println("Setup done");
+   }
+   last_ms = millis();
+}
+
+void loop()
+{
+   lv_timer_handler(); /* let the GUI do its work */
+   delay(5);
+}
