@@ -44,7 +44,7 @@ At the same time, it supports battery and USB power supply methods, which brings
 
 related library versions
 
-![library](md_pic/MaTouch_ESP32-S3-Parallel-TFT-1.9-lib version.jpg)
+![library](md_pic/lib.jpg)
 
 - Use type-c use cable connect USB-TTL to PC.
 - Select "ESP32-S3 DEV Module"
